@@ -1,749 +1,1029 @@
 <!DOCTYPE html>
-<html lang="th" class="dark-theme">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#111827">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="JobManager">
+    <meta name="apple-mobile-web-app-title" content="Fastwork Jobs">
     <link rel="manifest" href="manifest.json">
-    <title>ระบบจัดการงานลูกค้า</title>
+    <title>Fastwork Job Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
+        :root {
+            --bg: #f4f7fb;
+            --surface: #ffffff;
+            --surface-2: #eef4fb;
+            --text: #142033;
+            --muted: #64748b;
+            --line: #d8e1ed;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --green: #0f9f6e;
+            --amber: #b7791f;
+            --red: #dc2626;
+            --shadow: 0 16px 40px rgba(15, 23, 42, 0.10);
+        }
+
         * {
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Sarabun', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #e0e0e0;
             margin: 0;
-            padding: 15px;
-            transition: all 0.3s ease;
             min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 34rem),
+                linear-gradient(180deg, #f8fbff 0%, var(--bg) 42%, #edf3f9 100%);
+            color: var(--text);
+            font-family: "Sarabun", system-ui, sans-serif;
+            padding: 22px;
         }
-        
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            background: linear-gradient(135deg, #1a1f3a 0%, #16213e 50%, #0f3460 100%);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(187, 134, 252, 0.2);
+
+        button, input, textarea, select {
+            font: inherit;
         }
-        
-        h1 {
+
+        button {
+            min-height: 44px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--primary);
             color: #fff;
-            font-size: 2.2em;
-            margin: 0 0 10px 0;
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #bb86fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 8px rgba(187, 134, 252, 0.3);
-        }
-        
-        h2 {
-            color: #bb86fc;
-            font-size: 1.4em;
-            margin: 30px 0 20px 0;
-            border-bottom: 3px solid;
-            border-image: linear-gradient(90deg, #bb86fc, #fed6e3) 1;
-            padding-bottom: 12px;
+            cursor: pointer;
             font-weight: 700;
+            padding: 10px 16px;
+            transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
         }
-        
+
+        button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.62;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .app {
+            width: min(1280px, 100%);
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            align-items: flex-end;
+            margin-bottom: 18px;
+        }
+
+        .eyebrow {
+            margin: 0 0 6px;
+            color: var(--primary);
+            font-size: 0.86rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.85rem, 3vw, 3rem);
+            letter-spacing: 0;
+            line-height: 1.15;
+        }
+
+        .subtitle {
+            margin: 10px 0 0;
+            color: var(--muted);
+            max-width: 760px;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(92px, 1fr));
+            gap: 10px;
+            min-width: 330px;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+        }
+
+        .stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.78rem;
+            margin-bottom: 4px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.26rem;
+            line-height: 1;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .panel-note {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .capture-panel {
+            position: sticky;
+            top: 18px;
+            overflow: hidden;
+        }
+
+        .drop-zone {
+            margin: 18px 20px 14px;
+            border: 2px dashed #a9b9cf;
+            border-radius: 8px;
+            background: #f8fbff;
+            min-height: 210px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 18px;
+            color: var(--muted);
+            position: relative;
+        }
+
+        .drop-zone.dragover {
+            border-color: var(--primary);
+            background: #eef6ff;
+        }
+
+        .drop-zone input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drop-content strong {
+            display: block;
+            color: var(--text);
+            font-size: 1.06rem;
+            margin-bottom: 6px;
+        }
+
+        .image-preview {
+            display: none;
+            width: 100%;
+            max-height: 320px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #e5edf7;
+        }
+
+        .capture-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 0 20px 18px;
+        }
+
+        .secondary-btn {
+            background: #e8eef7;
+            color: #1f2a3d;
+            box-shadow: none;
+        }
+
+        .secondary-btn:hover {
+            background: #dfe8f3;
+        }
+
+        .danger-btn {
+            background: #fee2e2;
+            color: var(--red);
+            box-shadow: none;
+        }
+
+        .danger-btn:hover {
+            background: #fecaca;
+        }
+
+        .ocr-text {
+            padding: 0 20px 20px;
+        }
+
+        .ocr-status {
+            min-height: 22px;
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        textarea, input, select {
+            width: 100%;
+            border: 1px solid #c9d5e4;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text);
+            padding: 11px 12px;
+            outline: none;
+            transition: border 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        textarea {
+            min-height: 96px;
+            resize: vertical;
+            line-height: 1.55;
+        }
+
+        .form-panel {
+            padding-bottom: 20px;
+        }
+
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 18px;
-            margin-bottom: 25px;
-            background: rgba(15, 52, 96, 0.5);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid rgba(187, 134, 252, 0.15);
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            padding: 18px 20px 10px;
         }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
+
+        .field {
+            display: grid;
+            gap: 7px;
         }
-        
+
+        .field.wide {
+            grid-column: 1 / -1;
+        }
+
         label {
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #a8d8ea;
-            font-size: 0.95em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        input[type="text"], 
-        input[type="tel"], 
-        input[type="url"], 
-        input[type="date"],
-        input[type="time"],
-        input[type="number"],
-        textarea, 
-        input[type="datetime-local"] {
-            padding: 12px 15px;
-            border: 2px solid #4a4e69;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: 'Sarabun', sans-serif;
-            background-color: rgba(26, 26, 46, 0.8);
-            color: #fff;
-            transition: all 0.3s ease;
-        }
-        
-        input[type="text"]:focus, 
-        input[type="tel"]:focus, 
-        input[type="url"]:focus,
-        input[type="date"]:focus,
-        input[type="time"]:focus,
-        input[type="number"]:focus,
-        textarea:focus, 
-        input[type="datetime-local"]:focus {
-            outline: none;
-            border-color: #bb86fc;
-            box-shadow: 0 0 15px rgba(187, 134, 252, 0.5), inset 0 0 8px rgba(187, 134, 252, 0.2);
-            background-color: rgba(26, 26, 46, 0.95);
-        }
-        
-        textarea {
-            resize: vertical;
-            min-height: 90px;
-            font-size: 15px;
-        }
-        
-        button {
-            padding: 13px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-        }
-        
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
-        }
-        
-        .job-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-            background: rgba(15, 52, 96, 0.3);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .job-table th, .job-table td {
-            padding: 16px;
-            text-align: left;
-            border-bottom: 1px solid rgba(187, 134, 252, 0.1);
-        }
-        
-        .job-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
+            color: #334155;
             font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9em;
-            letter-spacing: 0.5px;
+            font-size: 0.92rem;
         }
-        
-        .job-table tbody tr {
-            transition: all 0.3s ease;
-            background-color: rgba(31, 41, 74, 0.5);
-        }
-        
-        .job-table tbody tr:hover {
-            background-color: rgba(102, 126, 234, 0.1);
-            box-shadow: inset 0 0 15px rgba(187, 134, 252, 0.05);
-        }
-        
-        .job-table tr:nth-child(even) {
-            background-color: rgba(26, 26, 46, 0.4);
-        }
-        
-        .status-pending { 
-            color: #ffd700; 
-            font-weight: 700;
-            background: rgba(255, 215, 0, 0.15);
-            padding: 4px 10px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        
-        .status-completed { 
-            color: #81c784; 
-            font-weight: 700;
-            background: rgba(129, 199, 132, 0.15);
-            padding: 4px 10px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        
-        .action-buttons {
-            display: flex;
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
-            flex-wrap: wrap;
         }
 
-        .action-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-size: 13px;
-            padding: 8px 14px;
-            width: auto;
-            flex-grow: 1;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
-        }
-        
-        .action-btn:disabled {
-            background-color: #999;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        
-        .delete-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
-        }
-        
-        .delete-btn:hover {
-            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.5);
+        .form-actions {
+            display: grid;
+            grid-template-columns: 1.4fr 0.8fr;
+            gap: 10px;
+            padding: 10px 20px 0;
         }
 
-        .notes-input {
-            width: 95%;
-            margin-top: 10px;
-            background-color: rgba(26, 26, 46, 0.8);
-            color: #fff;
-            border: 2px solid #4a4e69;
+        .hint-strip {
+            margin: 8px 20px 0;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--line);
             border-radius: 8px;
-            padding: 12px 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .notes-input:focus {
-            border-color: #bb86fc;
-            box-shadow: 0 0 15px rgba(187, 134, 252, 0.5);
-        }
-        
-        a { 
-            color: #a8edea;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(168, 237, 234, 0.3);
-        }
-        
-        a:hover {
-            color: #bb86fc;
-            border-bottom-color: #bb86fc;
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.55;
         }
 
-        .date-header {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
+        .jobs-panel {
+            margin-top: 18px;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--line);
+            background: #fbfdff;
+        }
+
+        .search-box {
+            max-width: 360px;
+        }
+
+        .job-list {
+            display: grid;
+            gap: 12px;
+            padding: 16px 20px 20px;
+        }
+
+        .empty {
+            text-align: center;
+            color: var(--muted);
+            padding: 28px 12px;
+            border: 1px dashed var(--line);
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .date-title {
+            color: #475569;
+            font-weight: 800;
+            font-size: 0.95rem;
+            margin: 10px 0 0;
+        }
+
+        .job-card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fff;
+            padding: 14px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .job-main {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .job-name {
+            margin: 0 0 4px;
+            font-size: 1.08rem;
+            font-weight: 800;
+        }
+
+        .job-meta {
+            color: var(--muted);
+            line-height: 1.55;
+            word-break: break-word;
+        }
+
+        .job-meta a {
+            color: var(--primary);
             font-weight: 700;
-            text-align: center !important;
-            font-size: 1em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            text-decoration: none;
         }
 
-        /* Mobile Responsive Styles */
-        @media screen and (max-width: 768px) {
-            .container {
-                padding: 20px;
+        .price {
+            font-size: 1.16rem;
+            font-weight: 800;
+            color: var(--green);
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .pending {
+            color: var(--amber);
+            background: #fef3c7;
+        }
+
+        .completed {
+            color: var(--green);
+            background: #dcfce7;
+        }
+
+        .job-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .job-actions button {
+            min-height: 38px;
+            width: auto;
+            padding: 8px 12px;
+            box-shadow: none;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%) translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            background: #111827;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px 14px;
+            box-shadow: var(--shadow);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 20;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 980px) {
+            body {
+                padding: 14px;
             }
-            
-            h1 {
-                font-size: 1.8em;
+
+            .topbar, .workspace {
+                grid-template-columns: 1fr;
+                display: grid;
             }
-            
-            h2 {
-                font-size: 1.2em;
+
+            .quick-stats {
+                min-width: 0;
             }
-            
-            .form-grid {
-                padding: 15px;
-                gap: 15px;
+
+            .capture-panel {
+                position: static;
             }
-            
-            .job-table thead {
-                display: none;
+        }
+
+        @media (max-width: 680px) {
+            .form-grid, .job-main, .toolbar {
+                grid-template-columns: 1fr;
             }
-            
-            .job-table tr {
-                display: block;
-                margin-bottom: 15px;
-                border: 2px solid rgba(187, 134, 252, 0.2);
-                border-radius: 10px;                
-                background-color: rgba(31, 41, 74, 0.6);
-                padding: 10px 0;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+            .toolbar {
+                display: grid;
             }
-            
-            .job-table tbody tr:hover {
-                background-color: rgba(102, 126, 234, 0.15);
+
+            .capture-actions, .form-actions, .input-row, .quick-stats {
+                grid-template-columns: 1fr;
             }
-            
-            .job-table td {
-                display: block;
-                text-align: right;
-                font-size: 15px;
-                border-bottom: 1px solid rgba(187, 134, 252, 0.1);
-                position: relative;
-                padding: 12px 15px 12px 45%;
-            }
-            
-            .job-table td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 15px;
-                width: 40%;
-                font-weight: 700;
+
+            .price {
                 text-align: left;
-                color: #a8edea;
-            }
-            
-            .job-table td:last-child {
-                border-bottom: 0;
-            }
-            
-            button {
-                margin-top: 10px;
-            }
-            
-            td.date-header, td.empty-message {
-                padding-left: 15px;
-                text-align: center;
-            }
-            
-            td.date-header::before, td.empty-message::before {
-                display: none;
             }
         }
-
     </style>
-    <!-- Google Fonts for Thai characters -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <main class="app">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Fastwork freelance workflow</p>
+                <h1>จัดงานลูกค้าจากแคปแชทให้ไวขึ้น</h1>
+                <p class="subtitle">วางรูปหรืออัปโหลดภาพแชท ระบบจะ OCR แล้วเดาชื่อ เบอร์ ที่อยู่ รายละเอียดงาน ลิงก์แผนที่ และราคาให้ก่อน ช่องไหนไม่เจอให้เติมเองได้ทันที</p>
+            </div>
+            <section class="quick-stats" aria-label="สรุปงาน">
+                <div class="stat"><span>งานค้าง</span><strong id="pending-count">0</strong></div>
+                <div class="stat"><span>วันนี้</span><strong id="today-count">0</strong></div>
+                <div class="stat"><span>ยอดรวม</span><strong id="total-revenue">฿0</strong></div>
+            </section>
+        </header>
 
-    <div class="container">
-        <h1>ระบบจัดการงานลูกค้า</h1>
-
-        <h2>เพิ่มงานใหม่</h2>
-        <form id="add-job-form">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="customer-name">ชื่อ User ลูกค้า</label>
-                    <input type="text" id="customer-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="customer-phone">เบอร์โทร</label>
-                    <input type="tel" id="customer-phone" required>
-                </div>
-                <div class="form-group">
-                    <label for="customer-address-text">ที่อยู่ (ตัวหนังสือ)</label>
-                    <textarea id="customer-address-text"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="customer-address-link">ลิงค์ที่อยู่ (เช่น Google Maps)</label>
-                    <input type="url" id="customer-address-link" placeholder="https://maps.app.goo.gl/...">
-                </div>
-                <div class="form-group">
-                    <label for="job-description">อาการ/รายละเอียดงาน</label>
-                    <textarea id="job-description" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label>ระยะเวลาที่ใช้</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="number" id="job-duration-hours" placeholder="ชั่วโมง" min="0" style="width: 50%;">
-                        <input type="number" id="job-duration-minutes" placeholder="นาที" min="0" max="59" style="width: 50%;">
+        <section class="workspace">
+            <aside class="panel capture-panel">
+                <div class="panel-header">
+                    <div>
+                        <h2>1. นำเข้าจากแชท</h2>
+                        <p class="panel-note">ลากรูปเข้ามา คลิกเลือกไฟล์ หรือกด Ctrl+V เพื่อวางภาพจาก clipboard</p>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="job-date">วันที่ต้องทำ</label>
-                    <input type="date" id="job-date" required>
+                <div class="drop-zone" id="drop-zone">
+                    <input id="chat-image" type="file" accept="image/*" aria-label="อัปโหลดภาพแชท">
+                    <img id="image-preview" class="image-preview" alt="ตัวอย่างภาพแชท">
+                    <div id="drop-content" class="drop-content">
+                        <strong>วางภาพแคปแชทตรงนี้</strong>
+                        <span>รองรับ PNG, JPG และภาพที่คัดลอกมา</span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="job-time">เวลา</label>
-                    <input type="time" id="job-time" required>
+                <div class="capture-actions">
+                    <button type="button" id="ocr-btn">อ่านข้อมูลจากรูป</button>
+                    <button type="button" class="secondary-btn" id="parse-btn">ดึงข้อมูลจากข้อความ</button>
                 </div>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button type="submit" id="submit-btn">เพิ่มงาน</button>
-                <button type="button" id="cancel-btn" onclick="resetFormState()" style="display: none; background-image: linear-gradient(45deg, #95a5a6, #7f8c8d);">ยกเลิก</button>
-            </div>
-            </form>
+                <div class="ocr-text">
+                    <p class="ocr-status" id="ocr-status">ยังไม่ได้เลือกรูป</p>
+                    <textarea id="chat-text" placeholder="หรือวางข้อความแชทที่นี่ แล้วกดดึงข้อมูลจากข้อความ"></textarea>
+                </div>
+            </aside>
 
-            <h2>ตารางงาน (Job Queue)</h2>
-            <table class="job-table">
-                <thead>
-                    <tr>
-                        <th>ลูกค้า</th>
-                        <th>ติดต่อ</th>
-                        <th>ที่อยู่</th>
-                        <th>รายละเอียดงาน</th>
-                        <th>กำหนดการ</th>
-                        <th>สถานะ</th>
-                        <th>จัดการ</th>
-                    </tr>
-                </thead>
-                <tbody id="job-list">
-                    <!-- Job items will be inserted here by JavaScript -->
-                </tbody>
-            </table>
-    </div>
+            <div>
+                <form class="panel form-panel" id="job-form">
+                    <div class="panel-header">
+                        <div>
+                            <h2>2. ตรวจข้อมูลและบันทึกงาน</h2>
+                            <p class="panel-note">ระบบเติมเท่าที่เดาได้ ส่วนที่ไม่แน่ใจปล่อยว่างไว้ให้แก้เอง</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="customer-name">ชื่อ / User ลูกค้า</label>
+                            <input id="customer-name" type="text" autocomplete="name" required>
+                        </div>
+                        <div class="field">
+                            <label for="customer-phone">เบอร์โทร</label>
+                            <input id="customer-phone" type="tel" autocomplete="tel" required>
+                        </div>
+                        <div class="field wide">
+                            <label for="customer-address-text">ที่อยู่</label>
+                            <textarea id="customer-address-text"></textarea>
+                        </div>
+                        <div class="field">
+                            <label for="customer-address-link">ลิงก์แผนที่</label>
+                            <input id="customer-address-link" type="url" placeholder="https://maps.app.goo.gl/...">
+                        </div>
+                        <div class="field">
+                            <label for="job-price">ราคา</label>
+                            <input id="job-price" type="number" inputmode="decimal" min="0" step="1" placeholder="เช่น 1200">
+                        </div>
+                        <div class="field wide">
+                            <label for="job-description">อาการ / รายละเอียดงาน</label>
+                            <textarea id="job-description" required></textarea>
+                        </div>
+                        <div class="field">
+                            <label>ระยะเวลาที่ใช้</label>
+                            <div class="input-row">
+                                <input id="job-duration-hours" type="number" min="0" placeholder="ชั่วโมง">
+                                <input id="job-duration-minutes" type="number" min="0" max="59" placeholder="นาที">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>กำหนดงาน</label>
+                            <div class="input-row">
+                                <input id="job-date" type="date" required>
+                                <input id="job-time" type="time" required>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="hint-strip">ทิป: หลัง OCR เสร็จ ลองเช็คเบอร์และบ้านเลขที่อีกครั้ง เพราะข้อความจากภาพแชทอาจอ่านเลขผิดได้</p>
+                    <div class="form-actions">
+                        <button id="submit-btn" type="submit">บันทึกงาน</button>
+                        <button id="cancel-btn" class="secondary-btn" type="button" hidden>ยกเลิกแก้ไข</button>
+                    </div>
+                </form>
+
+                <section class="panel jobs-panel">
+                    <div class="toolbar">
+                        <div>
+                            <h2>3. รายการงาน</h2>
+                            <p class="panel-note">เรียงงานค้างก่อน แล้วตามวันเวลา</p>
+                        </div>
+                        <input id="search-input" class="search-box" type="search" placeholder="ค้นหาชื่อ เบอร์ ที่อยู่ รายละเอียด">
+                    </div>
+                    <div id="job-list" class="job-list"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script>
-        // --- 0. PWA SETUP ---
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('Service Worker Registered'))
-                .catch(err => console.error('Service Worker Failed', err));
+        if ("serviceWorker" in navigator && location.protocol !== "file:") {
+            navigator.serviceWorker.register("sw.js").catch(console.error);
         }
 
-        // --- 1. DATA STORAGE (DATABASE SIMULATION) ---
-        // We use localStorage to persist data on the user's browser.
+        const storageKey = "jobs";
         let jobs = [];
         let isEditing = false;
         let editingJobId = null;
+        let currentImageFile = null;
 
-        // --- 2. DOM ELEMENT REFERENCES ---
-        const form = document.getElementById('add-job-form');
-        const jobList = document.getElementById('job-list');
+        const form = document.getElementById("job-form");
+        const jobList = document.getElementById("job-list");
+        const dropZone = document.getElementById("drop-zone");
+        const imageInput = document.getElementById("chat-image");
+        const imagePreview = document.getElementById("image-preview");
+        const dropContent = document.getElementById("drop-content");
+        const ocrBtn = document.getElementById("ocr-btn");
+        const parseBtn = document.getElementById("parse-btn");
+        const chatText = document.getElementById("chat-text");
+        const ocrStatus = document.getElementById("ocr-status");
+        const searchInput = document.getElementById("search-input");
+        const cancelBtn = document.getElementById("cancel-btn");
+        const submitBtn = document.getElementById("submit-btn");
 
-        // --- 3. FUNCTIONS ---
+        const fields = {
+            name: document.getElementById("customer-name"),
+            phone: document.getElementById("customer-phone"),
+            address: document.getElementById("customer-address-text"),
+            mapLink: document.getElementById("customer-address-link"),
+            price: document.getElementById("job-price"),
+            description: document.getElementById("job-description"),
+            hours: document.getElementById("job-duration-hours"),
+            minutes: document.getElementById("job-duration-minutes"),
+            date: document.getElementById("job-date"),
+            time: document.getElementById("job-time")
+        };
 
-        /**
-         * Saves the current jobs array to localStorage.
-         */
         function saveJobs() {
-            localStorage.setItem('jobs', JSON.stringify(jobs));
+            localStorage.setItem(storageKey, JSON.stringify(jobs));
         }
 
-        /**
-         * Loads jobs from localStorage.
-         */
         function loadJobs() {
-            const storedJobs = localStorage.getItem('jobs');
-            if (storedJobs) {
-                jobs = JSON.parse(storedJobs);
+            try {
+                jobs = JSON.parse(localStorage.getItem(storageKey)) || [];
+            } catch {
+                jobs = [];
             }
+            jobs = jobs.map(job => ({
+                ...job,
+                price: Number(job.price || 0),
+                customer: job.customer || { name: "", phone: "" },
+                address: job.address || { text: "", link: "" }
+            }));
         }
 
-        /**
-         * Renders all jobs from the 'jobs' array into the table.
-         */
-        function renderJobs() {
-            // Clear current table content
-            jobList.innerHTML = '';
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+            window.clearTimeout(showToast.timer);
+            showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+        }
 
-            if (jobs.length === 0) {
-                jobList.innerHTML = '<tr><td colspan="7" class="empty-message" style="text-align:center;">ยังไม่มีงานในระบบ</td></tr>';
+        function setDefaultSchedule() {
+            if (!fields.date.value) fields.date.value = new Date().toISOString().slice(0, 10);
+            if (!fields.time.value) fields.time.value = "10:00";
+        }
+
+        function formatMoney(value) {
+            const number = Number(value || 0);
+            return number.toLocaleString("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 });
+        }
+
+        function normalizePhone(text) {
+            const match = text.match(/(?:\+?66|0)[\d\s\-().]{8,}/);
+            return match ? match[0].replace(/[^\d+]/g, "").replace(/^\+66/, "0") : "";
+        }
+
+        function pickLineAfter(lines, keywords) {
+            const index = lines.findIndex(line => keywords.some(keyword => line.toLowerCase().startsWith(keyword)));
+            if (index === -1) return "";
+            const labelPattern = keywords.map(escapeRegExp).join("|");
+            const sameLine = lines[index].replace(new RegExp(`^\\s*(?:${labelPattern})\\s*[:：-]?\\s*`, "i"), "").trim();
+            return sameLine || lines[index + 1] || "";
+        }
+
+        function escapeRegExp(value) {
+            return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }
+
+        function parseChatInfo(rawText) {
+            const text = rawText.replace(/\r/g, "\n").replace(/[ \t]+/g, " ").trim();
+            const lines = text.split("\n").map(line => line.trim()).filter(Boolean);
+            const mapLink = (text.match(/https?:\/\/(?:maps\.app\.goo\.gl|goo\.gl\/maps|www\.google\.com\/maps|maps\.google)[^\s]+/i) || [])[0] || "";
+            const phone = normalizePhone(text);
+            const priceMatch = text.match(/(?:ราคา|ยอดรวม|รวม|ค่าบริการ|price)\s*[:：-]?\s*฿?\s*([0-9]{2,3}(?:[, ]?[0-9]{3})+|[0-9]{3,6})|฿\s*([0-9]{2,3}(?:[, ]?[0-9]{3})+|[0-9]{3,6})|([0-9]{2,3}(?:[, ]?[0-9]{3})+|[0-9]{3,6})\s*(?:บาท|บ\.|thb)/i);
+            const price = priceMatch ? (priceMatch[1] || priceMatch[2] || priceMatch[3] || "").replace(/[^\d]/g, "") : "";
+            const name = pickLineAfter(lines, ["ชื่อ", "name", "user", "ลูกค้า"]) || guessName(lines, phone);
+            const address = pickLineAfter(lines, ["ที่อยู่", "address", "บ้าน", "หมู่บ้าน", "คอนโด"]) || guessAddress(lines);
+            const description = pickLineAfter(lines, ["อาการ", "รายละเอียด", "งาน", "ซ่อม", "ติดตั้ง", "ปัญหา"]) || guessDescription(lines, [name, phone, address, mapLink, price]);
+
+            return { name, phone, address, mapLink, price, description };
+        }
+
+        function guessName(lines, phone) {
+            return lines.find(line => {
+                const lower = line.toLowerCase();
+                return line.length <= 42 && !line.includes(phone) && !/(https?:|ราคา|บาท|ที่อยู่|อาการ|เบอร์|โทร|address|maps)/i.test(lower);
+            }) || "";
+        }
+
+        function guessAddress(lines) {
+            const addressWords = /(บ้านเลขที่|หมู่บ้าน|คอนโด|อาคาร|ซอย|ถนน|ตำบล|แขวง|อำเภอ|เขต|จังหวัด|จ\.|ถ\.|ซ\.)/;
+            const start = lines.findIndex(line => addressWords.test(line));
+            if (start === -1) return "";
+            return lines.slice(start, start + 3).filter(line => !/https?:|ราคา|บาท|เบอร์|โทร/i.test(line)).join(" ");
+        }
+
+        function guessDescription(lines, usedValues) {
+            return lines.filter(line => {
+                if (usedValues.some(value => value && line.includes(String(value)))) return false;
+                return !/(https?:|เบอร์|โทร|ที่อยู่|ราคา|บาท|฿)/i.test(line);
+            }).slice(0, 3).join("\n");
+        }
+
+        function applyParsedInfo(parsed) {
+            const map = [
+                [fields.name, parsed.name],
+                [fields.phone, parsed.phone],
+                [fields.address, parsed.address],
+                [fields.mapLink, parsed.mapLink],
+                [fields.price, parsed.price],
+                [fields.description, parsed.description]
+            ];
+
+            map.forEach(([field, value]) => {
+                if (value && !field.value.trim()) field.value = value;
+            });
+            setDefaultSchedule();
+            showToast("ดึงข้อมูลให้แล้ว ลองตรวจช่องที่ยังว่างอีกครั้ง");
+        }
+
+        function renderStats() {
+            const today = new Date().toISOString().slice(0, 10);
+            const pending = jobs.filter(job => job.status === "pending");
+            const todayJobs = jobs.filter(job => (job.schedule || "").slice(0, 10) === today);
+            const revenue = jobs.reduce((sum, job) => sum + Number(job.price || 0), 0);
+            document.getElementById("pending-count").textContent = pending.length;
+            document.getElementById("today-count").textContent = todayJobs.length;
+            document.getElementById("total-revenue").textContent = formatMoney(revenue);
+        }
+
+        function renderJobs() {
+            renderStats();
+            const query = searchInput.value.trim().toLowerCase();
+            const filtered = jobs.filter(job => {
+                const haystack = [
+                    job.customer.name,
+                    job.customer.phone,
+                    job.address.text,
+                    job.description,
+                    job.price
+                ].join(" ").toLowerCase();
+                return haystack.includes(query);
+            }).sort((a, b) => {
+                if (a.status !== b.status) return a.status === "pending" ? -1 : 1;
+                return new Date(a.schedule || 0) - new Date(b.schedule || 0);
+            });
+
+            if (!filtered.length) {
+                jobList.innerHTML = `<div class="empty">${query ? "ไม่พบงานที่ค้นหา" : "ยังไม่มีงานในระบบ เริ่มจากแคปแชทหรือกรอกงานแรกได้เลย"}</div>`;
                 return;
             }
-            
-            // Sort jobs: pending first, then by schedule datetime
-            jobs.sort((a, b) => {
-                if (a.status === 'pending' && b.status === 'completed') return -1;
-                if (a.status === 'completed' && b.status === 'pending') return 1;
-                return new Date(a.schedule) - new Date(b.schedule);
-            });
 
-            let lastDate = null;
-
-            // Create and append a table row for each job
-            jobs.forEach(job => {
-                const jobDate = new Date(job.schedule).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
-
-                // Add a date header if the day is different from the last one
-                if (jobDate !== lastDate) {
-                    const dateRow = document.createElement('tr');
-                    dateRow.innerHTML = `<td colspan="7" class="date-header">${jobDate}</td>`;
-                    jobList.appendChild(dateRow);
-                    lastDate = jobDate;
-                }
-
-                const row = document.createElement('tr');
-                row.id = `job-${job.id}`;
-
-                const addressLink = job.address.link ? `<a href="${job.address.link}" target="_blank">เปิดลิงค์</a>` : 'ไม่มีลิงค์';
-                const addressInfo = `${job.address.text} <br>(${addressLink})`;
-                
-                const statusClass = job.status === 'pending' ? 'status-pending' : 'status-completed';
-                const statusText = job.status === 'pending' ? 'รอดำเนินการ' : 'เสร็จสิ้น';
-                
-                const scheduleTime = new Date(job.schedule).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
-
-                row.innerHTML = `
-                    <td data-label="ลูกค้า">${job.customer.name}</td>
-                    <td data-label="ติดต่อ">
-                        <a href="tel:${job.customer.phone}">${job.customer.phone}</a>
-                        <button type="button" onclick="copyToClipboard('${job.customer.phone}')" style="display: inline-block; width: auto; padding: 4px 8px; margin-left: 5px; font-size: 12px;">คัดลอก</button>
-                    </td>
-                    <td data-label="ที่อยู่">${addressInfo}</td>
-                    <td data-label="รายละเอียด">
-                        <strong>อาการ:</strong> ${job.description}<br>
-                        <strong>เวลาที่ใช้:</strong> ${job.duration}
-                    </td>
-                    <td data-label="เวลา">${scheduleTime}</td>
-                    <td data-label="สถานะ"><span class="${statusClass}">${statusText}</span></td>
-                    <td data-label="จัดการ" id="action-cell-${job.id}"></td>
-                `;
-                
-                jobList.appendChild(row);
-                
-                // Create and add action button/notes area
-                const actionCell = document.getElementById(`action-cell-${job.id}`);
-                const buttonContainer = document.createElement('div');
-                buttonContainer.className = 'action-buttons';
-
-                if (job.status === 'pending') {
-                    const completeButton = document.createElement('button');
-                    completeButton.textContent = 'ทำงานเสร็จแล้ว';
-                    completeButton.classList.add('action-btn');
-                    completeButton.onclick = () => completeJob(job.id);
-                    buttonContainer.appendChild(completeButton);
-
-                    const editButton = document.createElement('button');
-                    editButton.textContent = 'แก้ไข';
-                    editButton.classList.add('action-btn');
-                    editButton.style.backgroundImage = 'linear-gradient(45deg, #f39c12, #d35400)'; // Orange color
-                    editButton.onclick = () => editJob(job.id);
-                    buttonContainer.appendChild(editButton);
-
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'ลบ';
-                    deleteButton.classList.add('action-btn', 'delete-btn');
-                    deleteButton.onclick = () => deleteJob(job.id);
-                    buttonContainer.appendChild(deleteButton);
-
-                    actionCell.appendChild(buttonContainer);
-                } else {
-                    const notesArea = document.createElement('div');
-                    notesArea.innerHTML = `
-                        <label for="notes-${job.id}"><strong>ข้อมูลทิ้งท้าย:</strong></label>
-                        <textarea id="notes-${job.id}" class="notes-input" placeholder="กรอกข้อมูลหลังจบงาน...">${job.notes || ''}</textarea>
-                    `;
-                    actionCell.appendChild(notesArea);
-                    
-                    const notesTextarea = document.getElementById(`notes-${job.id}`);
-                    notesTextarea.addEventListener('blur', (e) => saveNotes(job.id, e.target.value)); // Use 'blur' to save when user clicks away
-
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'ลบ';
-                    deleteButton.classList.add('action-btn', 'delete-btn');
-                    deleteButton.style.marginTop = '10px';
-                    deleteButton.onclick = () => deleteJob(job.id);
-                    actionCell.appendChild(deleteButton);
-                }
-            });
+            let lastDate = "";
+            jobList.innerHTML = filtered.map(job => {
+                const dateKey = (job.schedule || "").slice(0, 10) || "ไม่ระบุวันที่";
+                const dateTitle = dateKey !== lastDate ? `<div class="date-title">${formatDateTitle(job.schedule)}</div>` : "";
+                lastDate = dateKey;
+                return dateTitle + renderJobCard(job);
+            }).join("");
         }
 
-        /**
-         * Handles the form submission to add a new job.
-         * @param {Event} event The form submission event.
-         */
-        function addJob(event) {
-            event.preventDefault(); // Prevent page from reloading
+        function formatDateTitle(schedule) {
+            if (!schedule) return "ไม่ระบุวันที่";
+            return new Date(schedule).toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+        }
 
-            const hours = document.getElementById('job-duration-hours').value || 0;
-            const minutes = document.getElementById('job-duration-minutes').value || 0;
-            const durationText = `${hours} ชั่วโมง ${minutes} นาที`;
+        function formatTime(schedule) {
+            if (!schedule) return "-";
+            return new Date(schedule).toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit", hour12: false });
+        }
 
-            const date = document.getElementById('job-date').value;
-            const time = document.getElementById('job-time').value;
-            const scheduleDateTime = `${date}T${time}`;
+        function renderJobCard(job) {
+            const map = job.address.link ? `<a href="${escapeAttr(job.address.link)}" target="_blank" rel="noopener">เปิดแผนที่</a>` : "ไม่มีลิงก์แผนที่";
+            const address = job.address.text || "ยังไม่ได้ใส่ที่อยู่";
+            const statusClass = job.status === "completed" ? "completed" : "pending";
+            const statusText = job.status === "completed" ? "เสร็จแล้ว" : "รอดำเนินการ";
+            const phone = job.customer.phone || "-";
+            const actions = job.status === "pending"
+                ? `<button type="button" onclick="completeJob(${job.id})">เสร็จงาน</button>`
+                : `<button type="button" class="secondary-btn" onclick="reopenJob(${job.id})">เปิดงานใหม่</button>`;
 
+            return `
+                <article class="job-card">
+                    <div class="job-main">
+                        <div>
+                            <p class="job-name">${escapeHtml(job.customer.name || "ไม่ระบุชื่อลูกค้า")}</p>
+                            <div class="job-meta">
+                                <a href="tel:${escapeAttr(phone)}">${escapeHtml(phone)}</a>
+                                <button type="button" class="secondary-btn" onclick="copyToClipboard('${escapeAttr(phone)}')">คัดลอก</button><br>
+                                ${escapeHtml(address)}<br>${map}
+                            </div>
+                        </div>
+                        <div class="job-meta">
+                            <span class="badge ${statusClass}">${statusText}</span><br>
+                            <strong>${formatTime(job.schedule)}</strong> · ${escapeHtml(job.duration || "0 ชั่วโมง 0 นาที")}<br>
+                            ${escapeHtml(job.description || "ไม่มีรายละเอียด")}
+                        </div>
+                        <div class="price">${formatMoney(job.price)}</div>
+                    </div>
+                    <div class="job-actions">
+                        ${actions}
+                        <button type="button" class="secondary-btn" onclick="editJob(${job.id})">แก้ไข</button>
+                        <button type="button" class="danger-btn" onclick="deleteJob(${job.id})">ลบ</button>
+                    </div>
+                </article>
+            `;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, char => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                "\"": "&quot;",
+                "'": "&#039;"
+            }[char]));
+        }
+
+        function escapeAttr(value) {
+            return escapeHtml(value).replace(/`/g, "&#096;");
+        }
+
+        function getFormData() {
+            const hours = fields.hours.value || 0;
+            const minutes = fields.minutes.value || 0;
+            return {
+                customer: {
+                    name: fields.name.value.trim(),
+                    phone: fields.phone.value.trim()
+                },
+                address: {
+                    text: fields.address.value.trim(),
+                    link: fields.mapLink.value.trim()
+                },
+                price: Number(fields.price.value || 0),
+                description: fields.description.value.trim(),
+                duration: `${hours} ชั่วโมง ${minutes} นาที`,
+                schedule: `${fields.date.value}T${fields.time.value}`,
+                status: "pending",
+                notes: ""
+            };
+        }
+
+        function addOrUpdateJob(event) {
+            event.preventDefault();
             if (isEditing) {
-                // Update existing job
-                const jobIndex = jobs.findIndex(j => j.id === editingJobId);
-                if (jobIndex !== -1) {
-                    jobs[jobIndex].customer.name = document.getElementById('customer-name').value;
-                    jobs[jobIndex].customer.phone = document.getElementById('customer-phone').value;
-                    jobs[jobIndex].address.text = document.getElementById('customer-address-text').value;
-                    jobs[jobIndex].address.link = document.getElementById('customer-address-link').value;
-                    jobs[jobIndex].description = document.getElementById('job-description').value;
-                    jobs[jobIndex].duration = durationText;
-                    jobs[jobIndex].schedule = scheduleDateTime;
-                    
-                    saveJobs();
-                    renderJobs();
-                    resetFormState();
-                    alert('แก้ไขข้อมูลเรียบร้อยแล้ว');
-                }
+                const job = jobs.find(item => item.id === editingJobId);
+                if (job) Object.assign(job, getFormData(), { id: job.id, status: job.status, notes: job.notes || "" });
+                showToast("บันทึกการแก้ไขแล้ว");
             } else {
-                // Create a new job object
-                const newJob = {
-                    id: Date.now(), // Simple unique ID
-                    customer: {
-                        name: document.getElementById('customer-name').value,
-                        phone: document.getElementById('customer-phone').value,
-                    },
-                    address: {
-                        text: document.getElementById('customer-address-text').value,
-                        link: document.getElementById('customer-address-link').value,
-                    },
-                    description: document.getElementById('job-description').value,
-                    duration: durationText,
-                    schedule: scheduleDateTime,
-                    status: 'pending', // 'pending' or 'completed'
-                    notes: ''
-                };
-
-                // Add the new job to our array
-                jobs.push(newJob);
-                saveJobs();
-
-                // Reset the form for the next entry
-                form.reset();
-
-                // Re-render the job list to show the new job
-                renderJobs();
+                jobs.push({ id: Date.now(), ...getFormData() });
+                showToast("เพิ่มงานใหม่แล้ว");
             }
+            saveJobs();
+            resetFormState();
+            renderJobs();
         }
 
-        /**
-         * Marks a job as completed.
-         * @param {number} jobId The ID of the job to complete.
-         */
-        function completeJob(jobId) {
-            const job = jobs.find(j => j.id === jobId);
-            if (job) {
-                job.status = 'completed';
-                saveJobs();
-                renderJobs(); // Re-render to show the change
-            }
-        }
-
-        /**
-         * Prepares the form for editing a job.
-         * @param {number} jobId The ID of the job to edit.
-         */
         function editJob(jobId) {
-            const job = jobs.find(j => j.id === jobId);
+            const job = jobs.find(item => item.id === jobId);
             if (!job) return;
-
-            document.getElementById('customer-name').value = job.customer.name;
-            document.getElementById('customer-phone').value = job.customer.phone;
-            document.getElementById('customer-address-text').value = job.address.text;
-            document.getElementById('customer-address-link').value = job.address.link;
-            document.getElementById('job-description').value = job.description;
-
-            // Parse duration back to inputs
-            const durationMatch = job.duration.match(/(\d+)\s*ชั่วโมง\s*(\d+)\s*นาที/);
-            if (durationMatch) {
-                document.getElementById('job-duration-hours').value = durationMatch[1];
-                document.getElementById('job-duration-minutes').value = durationMatch[2];
-            }
-
-            // Parse schedule back to inputs
-            const [date, time] = job.schedule.split('T');
-            document.getElementById('job-date').value = date;
-            document.getElementById('job-time').value = time;
-
+            fields.name.value = job.customer.name || "";
+            fields.phone.value = job.customer.phone || "";
+            fields.address.value = job.address.text || "";
+            fields.mapLink.value = job.address.link || "";
+            fields.price.value = job.price || "";
+            fields.description.value = job.description || "";
+            const duration = (job.duration || "").match(/(\d+)\s*ชั่วโมง\s*(\d+)\s*นาที/);
+            fields.hours.value = duration ? duration[1] : "";
+            fields.minutes.value = duration ? duration[2] : "";
+            const [date, time = ""] = (job.schedule || "").split("T");
+            fields.date.value = date || "";
+            fields.time.value = time.slice(0, 5) || "";
             isEditing = true;
             editingJobId = jobId;
-
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.textContent = 'บันทึกการแก้ไข';
-            submitBtn.style.backgroundImage = 'linear-gradient(45deg, #f39c12, #d35400)';
-            
-            document.getElementById('cancel-btn').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            submitBtn.textContent = "บันทึกการแก้ไข";
+            cancelBtn.hidden = false;
+            window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         function resetFormState() {
             form.reset();
             isEditing = false;
             editingJobId = null;
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.textContent = 'เพิ่มงาน';
-            submitBtn.style.backgroundImage = ''; // Revert to default CSS
-            document.getElementById('cancel-btn').style.display = 'none';
+            submitBtn.textContent = "บันทึกงาน";
+            cancelBtn.hidden = true;
+            setDefaultSchedule();
         }
-        
-        /**
-         * Deletes a job from the list.
-         * @param {number} jobId The ID of the job to delete.
-         */
-        function deleteJob(jobId) {
-            if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบงานนี้?')) {
-                jobs = jobs.filter(j => j.id !== jobId);
+
+        function completeJob(jobId) {
+            const job = jobs.find(item => item.id === jobId);
+            if (job) {
+                job.status = "completed";
                 saveJobs();
                 renderJobs();
             }
         }
 
-        /**
-         * Saves the final notes for a completed job.
-         * @param {number} jobId The ID of the job.
-         * @param {string} notes The notes to save.
-         */
-        function saveNotes(jobId, notes) {
-            const job = jobs.find(j => j.id === jobId);
+        function reopenJob(jobId) {
+            const job = jobs.find(item => item.id === jobId);
             if (job) {
-                job.notes = notes;
+                job.status = "pending";
                 saveJobs();
-                console.log(`Notes saved for job ${jobId}: "${notes}"`);
+                renderJobs();
             }
         }
 
-        /**
-         * Copies text to clipboard
-         * @param {string} text The text to copy.
-         */
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('คัดลอกเบอร์โทรเรียบร้อยแล้ว: ' + text);
-            }).catch(err => {
-                console.error('ไม่สามารถคัดลอกได้: ', err);
-            });
+        function deleteJob(jobId) {
+            if (!confirm("ลบงานนี้ใช่ไหม?")) return;
+            jobs = jobs.filter(item => item.id !== jobId);
+            saveJobs();
+            renderJobs();
         }
 
-        // --- 4. EVENT LISTENERS ---
-        // Listen for form submission
-        form.addEventListener('submit', addJob);
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => showToast(`คัดลอก ${text} แล้ว`));
+        }
 
-        // Initial render of the job list when the page loads
-        document.addEventListener('DOMContentLoaded', () => {
+        function handleImage(file) {
+            if (!file || !file.type.startsWith("image/")) return;
+            currentImageFile = file;
+            imagePreview.src = URL.createObjectURL(file);
+            imagePreview.style.display = "block";
+            dropContent.style.display = "none";
+            ocrStatus.textContent = "เลือกรูปแล้ว กดอ่านข้อมูลจากรูปได้เลย";
+        }
+
+        async function runOcr() {
+            if (!currentImageFile) {
+                showToast("เลือกรูปแชทก่อนครับ");
+                return;
+            }
+            if (!window.Tesseract) {
+                ocrStatus.textContent = "โหลด OCR ไม่สำเร็จ ลองวางข้อความแชทแทนได้";
+                return;
+            }
+            ocrBtn.disabled = true;
+            ocrStatus.textContent = "กำลังอ่านตัวอักษรจากภาพ...";
+            try {
+                const result = await Tesseract.recognize(currentImageFile, "tha+eng", {
+                    logger: progress => {
+                        if (progress.status === "recognizing text") {
+                            ocrStatus.textContent = `กำลังอ่านภาพ ${Math.round(progress.progress * 100)}%`;
+                        }
+                    }
+                });
+                chatText.value = result.data.text.trim();
+                ocrStatus.textContent = "อ่านภาพเสร็จแล้ว";
+                applyParsedInfo(parseChatInfo(chatText.value));
+            } catch (error) {
+                console.error(error);
+                ocrStatus.textContent = "OCR ไม่สำเร็จ ลองครอปภาพให้เห็นข้อความชัดขึ้นหรือวางข้อความเอง";
+            } finally {
+                ocrBtn.disabled = false;
+            }
+        }
+
+        imageInput.addEventListener("change", event => handleImage(event.target.files[0]));
+        dropZone.addEventListener("dragover", event => {
+            event.preventDefault();
+            dropZone.classList.add("dragover");
+        });
+        dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+        dropZone.addEventListener("drop", event => {
+            event.preventDefault();
+            dropZone.classList.remove("dragover");
+            handleImage(event.dataTransfer.files[0]);
+        });
+        document.addEventListener("paste", event => {
+            const file = [...event.clipboardData.files].find(item => item.type.startsWith("image/"));
+            if (file) handleImage(file);
+        });
+        ocrBtn.addEventListener("click", runOcr);
+        parseBtn.addEventListener("click", () => applyParsedInfo(parseChatInfo(chatText.value)));
+        form.addEventListener("submit", addOrUpdateJob);
+        cancelBtn.addEventListener("click", resetFormState);
+        searchInput.addEventListener("input", renderJobs);
+
+        document.addEventListener("DOMContentLoaded", () => {
             loadJobs();
+            setDefaultSchedule();
             renderJobs();
         });
-
     </script>
-
 </body>
 </html>
