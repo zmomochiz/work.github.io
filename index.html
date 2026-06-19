@@ -23,30 +23,31 @@
             --line: #d8e1ed;
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
+            --primary-soft: #eaf1ff;
+            --purple: #7c3aed;
+            --purple-soft: #f1eaff;
             --green: #0f9f6e;
             --amber: #b7791f;
             --red: #dc2626;
             --shadow: 0 16px 40px rgba(15, 23, 42, 0.10);
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             margin: 0;
             min-height: 100vh;
             background:
                 radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 34rem),
+                radial-gradient(circle at top right, rgba(124, 58, 237, 0.10), transparent 30rem),
                 linear-gradient(180deg, #f8fbff 0%, var(--bg) 42%, #edf3f9 100%);
             color: var(--text);
             font-family: "Sarabun", system-ui, sans-serif;
             padding: 22px;
+            padding-bottom: 90px; /* room for mobile nav */
         }
 
-        button, input, textarea, select {
-            font: inherit;
-        }
+        button, input, textarea, select { font: inherit; }
 
         button {
             min-height: 44px;
@@ -61,29 +62,19 @@
             box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
         }
 
-        button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
+        button:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        button:disabled { cursor: not-allowed; opacity: 0.62; transform: none; box-shadow: none; }
 
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.62;
-            transform: none;
-            box-shadow: none;
-        }
+        .app { width: min(1280px, 100%); margin: 0 auto; }
 
-        .app {
-            width: min(1280px, 100%);
-            margin: 0 auto;
-        }
-
+        /* ===== TOP BAR ===== */
         .topbar {
             display: flex;
             justify-content: space-between;
             gap: 18px;
             align-items: flex-end;
             margin-bottom: 18px;
+            flex-wrap: wrap;
         }
 
         .eyebrow {
@@ -95,18 +86,13 @@
             text-transform: uppercase;
         }
 
-        h1 {
-            margin: 0;
-            font-size: clamp(1.85rem, 3vw, 3rem);
-            letter-spacing: 0;
-            line-height: 1.15;
-        }
+        h1 { margin: 0; font-size: clamp(1.6rem, 3vw, 2.5rem); letter-spacing: 0; line-height: 1.15; }
 
         .subtitle {
             margin: 10px 0 0;
             color: var(--muted);
             max-width: 760px;
-            font-size: 1rem;
+            font-size: 0.98rem;
             line-height: 1.7;
         }
 
@@ -114,7 +100,7 @@
             display: grid;
             grid-template-columns: repeat(3, minmax(92px, 1fr));
             gap: 10px;
-            min-width: 330px;
+            min-width: 320px;
         }
 
         .stat {
@@ -125,26 +111,64 @@
             box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
         }
 
-        .stat span {
-            display: block;
+        .stat span { display: block; color: var(--muted); font-size: 0.78rem; margin-bottom: 4px; }
+        .stat strong { display: block; font-size: 1.26rem; line-height: 1; }
+
+        /* ===== PAGE NAV (segmented tabs) ===== */
+        .page-nav {
+            display: flex;
+            gap: 6px;
+            background: rgba(255,255,255,0.7);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 5px;
+            margin-bottom: 18px;
+            width: fit-content;
+            box-shadow: 0 6px 18px rgba(15,23,42,0.05);
+        }
+
+        .page-nav button {
+            background: transparent;
             color: var(--muted);
+            box-shadow: none;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-nav button:hover { background: var(--surface-2); transform: none; color: var(--text); }
+
+        .page-nav button.active {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(37,99,235,0.28);
+        }
+
+        .nav-count {
+            background: rgba(255,255,255,0.3);
+            border-radius: 999px;
+            padding: 1px 8px;
             font-size: 0.78rem;
-            margin-bottom: 4px;
         }
 
-        .stat strong {
-            display: block;
-            font-size: 1.26rem;
-            line-height: 1;
+        .page-nav button:not(.active) .nav-count {
+            background: var(--surface-2);
+            color: var(--text);
         }
 
-        .workspace {
-            display: grid;
-            grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
-            gap: 18px;
-            align-items: start;
+        /* ===== PAGES ===== */
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.25s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ===== PANELS ===== */
         .panel {
             background: rgba(255, 255, 255, 0.94);
             border: 1px solid var(--line);
@@ -161,23 +185,19 @@
             border-bottom: 1px solid var(--line);
         }
 
-        h2 {
-            margin: 0;
-            font-size: 1.1rem;
+        h2 { margin: 0; font-size: 1.1rem; }
+
+        .panel-note { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+
+        /* ===== ADD-JOB PAGE LAYOUT ===== */
+        .add-workspace {
+            display: grid;
+            grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
         }
 
-        .panel-note {
-            margin: 4px 0 0;
-            color: var(--muted);
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .capture-panel {
-            position: sticky;
-            top: 18px;
-            overflow: hidden;
-        }
+        .capture-panel { position: sticky; top: 18px; overflow: hidden; }
 
         .drop-zone {
             margin: 18px 20px 14px;
@@ -193,24 +213,11 @@
             position: relative;
         }
 
-        .drop-zone.dragover {
-            border-color: var(--primary);
-            background: #eef6ff;
-        }
+        .drop-zone.dragover { border-color: var(--primary); background: #eef6ff; }
 
-        .drop-zone input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
+        .drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
 
-        .drop-content strong {
-            display: block;
-            color: var(--text);
-            font-size: 1.06rem;
-            margin-bottom: 6px;
-        }
+        .drop-content strong { display: block; color: var(--text); font-size: 1.06rem; margin-bottom: 6px; }
 
         .image-preview {
             display: none;
@@ -228,36 +235,16 @@
             padding: 0 20px 18px;
         }
 
-        .secondary-btn {
-            background: #e8eef7;
-            color: #1f2a3d;
-            box-shadow: none;
-        }
+        .secondary-btn { background: #e8eef7; color: #1f2a3d; box-shadow: none; }
+        .secondary-btn:hover { background: #dfe8f3; }
+        .danger-btn { background: #fee2e2; color: var(--red); box-shadow: none; }
+        .danger-btn:hover { background: #fecaca; }
 
-        .secondary-btn:hover {
-            background: #dfe8f3;
-        }
-
-        .danger-btn {
-            background: #fee2e2;
-            color: var(--red);
-            box-shadow: none;
-        }
-
-        .danger-btn:hover {
-            background: #fecaca;
-        }
-
-        .ocr-text {
-            padding: 0 20px 20px;
-        }
-
-        .ocr-status {
-            min-height: 22px;
-            margin: 0 0 8px;
-            color: var(--muted);
-            font-size: 0.9rem;
-        }
+        .ocr-text { padding: 0 20px 20px; }
+        .ocr-status { min-height: 22px; margin: 0 0 8px; color: var(--muted); font-size: 0.9rem; }
+        .ocr-status.busy { color: var(--primary); font-weight: 700; }
+        .ocr-status.ok { color: var(--green); font-weight: 700; }
+        .ocr-status.err { color: var(--red); font-weight: 700; }
 
         textarea, input, select {
             width: 100%;
@@ -275,15 +262,9 @@
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
         }
 
-        textarea {
-            min-height: 96px;
-            resize: vertical;
-            line-height: 1.55;
-        }
+        textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
 
-        .form-panel {
-            padding-bottom: 20px;
-        }
+        .form-panel { padding-bottom: 20px; }
 
         .form-grid {
             display: grid;
@@ -292,26 +273,12 @@
             padding: 18px 20px 10px;
         }
 
-        .field {
-            display: grid;
-            gap: 7px;
-        }
+        .field { display: grid; gap: 7px; }
+        .field.wide { grid-column: 1 / -1; }
 
-        .field.wide {
-            grid-column: 1 / -1;
-        }
+        label { color: #334155; font-weight: 700; font-size: 0.92rem; }
 
-        label {
-            color: #334155;
-            font-weight: 700;
-            font-size: 0.92rem;
-        }
-
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         .form-actions {
             display: grid;
@@ -331,10 +298,8 @@
             line-height: 1.55;
         }
 
-        .jobs-panel {
-            margin-top: 18px;
-            overflow: hidden;
-        }
+        /* ===== JOB LIST PAGE ===== */
+        .jobs-panel { overflow: hidden; }
 
         .toolbar {
             display: flex;
@@ -344,108 +309,227 @@
             padding: 14px 20px;
             border-bottom: 1px solid var(--line);
             background: #fbfdff;
+            flex-wrap: wrap;
         }
 
-        .search-box {
-            max-width: 360px;
+        .search-box { max-width: 360px; }
+
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+            padding: 12px 20px 0;
+            flex-wrap: wrap;
         }
 
-        .job-list {
-            display: grid;
-            gap: 12px;
-            padding: 16px 20px 20px;
+        .chip {
+            background: var(--surface-2);
+            color: var(--muted);
+            box-shadow: none;
+            font-size: 0.85rem;
+            padding: 7px 14px;
+            border-radius: 999px;
+            font-weight: 700;
         }
+
+        .chip:hover { background: #e1eaf7; transform: none; color: var(--text); }
+
+        .chip.active {
+            background: linear-gradient(135deg, var(--primary), var(--purple));
+            color: #fff;
+        }
+
+        .job-list { display: grid; gap: 12px; padding: 16px 20px 20px; }
 
         .empty {
             text-align: center;
             color: var(--muted);
-            padding: 28px 12px;
+            padding: 36px 12px;
             border: 1px dashed var(--line);
             border-radius: 8px;
             background: #f8fafc;
         }
 
+        .empty strong { display: block; color: var(--text); font-size: 1.05rem; margin-bottom: 6px; }
+
         .date-title {
-            color: #475569;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1f2a3d;
             font-weight: 800;
             font-size: 0.95rem;
-            margin: 10px 0 0;
+            margin: 14px 0 2px;
         }
 
+        .date-title:first-child { margin-top: 0; }
+
+        .date-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--line);
+        }
+
+        .date-title .day-tag {
+            background: var(--primary-soft);
+            color: var(--primary-dark);
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+        }
+
+        /* ===== REDESIGNED JOB CARD — scannable, schedule-first ===== */
         .job-card {
             border: 1px solid var(--line);
-            border-radius: 8px;
+            border-radius: 10px;
             background: #fff;
-            padding: 14px;
+            overflow: hidden;
             display: grid;
-            gap: 12px;
+            grid-template-columns: 86px 1fr;
+            transition: box-shadow 0.18s ease, border-color 0.18s ease;
         }
 
-        .job-main {
-            display: grid;
-            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
-            gap: 12px;
-            align-items: start;
+        .job-card:hover { box-shadow: 0 10px 24px rgba(15,23,42,0.08); border-color: #c2d3ea; }
+
+        .job-card.completed { opacity: 0.72; }
+
+        /* time block on the left — the thing the user said they couldn't find */
+        .job-time-block {
+            background: var(--surface-2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px 6px;
+            border-right: 1px solid var(--line);
+            gap: 2px;
+        }
+
+        .job-card.completed .job-time-block { background: #eafaf1; }
+
+        .time-clock {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            line-height: 1.1;
+        }
+
+        .job-card.completed .time-clock { color: var(--green); }
+
+        .time-wday {
+            font-size: 0.72rem;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .time-dom {
+            font-size: 0.85rem;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .job-body { padding: 14px 16px; display: grid; gap: 10px; }
+
+        .job-top-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
         }
 
         .job-name {
-            margin: 0 0 4px;
+            margin: 0;
             font-size: 1.08rem;
             font-weight: 800;
-        }
-
-        .job-meta {
-            color: var(--muted);
-            line-height: 1.55;
-            word-break: break-word;
-        }
-
-        .job-meta a {
-            color: var(--primary);
-            font-weight: 700;
-            text-decoration: none;
-        }
-
-        .price {
-            font-size: 1.16rem;
-            font-weight: 800;
-            color: var(--green);
-            white-space: nowrap;
-            text-align: right;
+            line-height: 1.3;
         }
 
         .badge {
             display: inline-flex;
             align-items: center;
-            min-height: 28px;
+            min-height: 26px;
             border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 0.82rem;
+            padding: 3px 11px;
+            font-size: 0.78rem;
             font-weight: 800;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
-        .pending {
-            color: var(--amber);
-            background: #fef3c7;
+        .pending { color: var(--amber); background: #fef3c7; }
+        .completed { color: var(--green); background: #dcfce7; }
+
+        .job-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+            gap: 8px 16px;
+            font-size: 0.9rem;
         }
 
-        .completed {
-            color: var(--green);
-            background: #dcfce7;
-        }
-
-        .job-actions {
+        .info-item {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            align-items: flex-start;
+            gap: 6px;
+            color: var(--text);
+            min-width: 0;
         }
+
+        .info-item .ico { flex-shrink: 0; opacity: 0.7; }
+
+        .info-item span.val { word-break: break-word; min-width: 0; }
+
+        .info-item a { color: var(--primary); font-weight: 700; text-decoration: none; }
+        .info-item a:hover { text-decoration: underline; }
+
+        .info-item.wide { grid-column: 1 / -1; }
+
+        .job-desc {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: #334155;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border: 1px solid #eef2f7;
+        }
+
+        .job-bottom-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .price-tag {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--green);
+        }
+
+        .job-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 
         .job-actions button {
-            min-height: 38px;
+            min-height: 36px;
             width: auto;
-            padding: 8px 12px;
+            padding: 7px 12px;
             box-shadow: none;
+            font-size: 0.86rem;
         }
+
+        .copy-phone-btn {
+            background: transparent;
+            color: var(--muted);
+            min-height: 0;
+            padding: 0 0 0 4px;
+            box-shadow: none;
+            font-size: 0.78rem;
+            text-decoration: underline;
+        }
+
+        .copy-phone-btn:hover { background: transparent; color: var(--primary); transform: none; }
 
         .toast {
             position: fixed;
@@ -463,46 +547,57 @@
             z-index: 20;
         }
 
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* ===== Mobile bottom nav (alt entry point for switching pages) ===== */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.96);
+            border-top: 1px solid var(--line);
+            box-shadow: 0 -8px 24px rgba(15,23,42,0.08);
+            padding: 8px 14px;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            z-index: 30;
+            gap: 8px;
         }
 
+        .mobile-nav button {
+            flex: 1;
+            background: transparent;
+            color: var(--muted);
+            box-shadow: none;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 0.78rem;
+            padding: 6px 4px;
+        }
+
+        .mobile-nav button .ico { font-size: 1.2rem; }
+
+        .mobile-nav button.active { color: var(--primary); }
+        .mobile-nav button:hover { transform: none; background: transparent; }
+
         @media (max-width: 980px) {
-            body {
-                padding: 14px;
-            }
-
-            .topbar, .workspace {
-                grid-template-columns: 1fr;
-                display: grid;
-            }
-
-            .quick-stats {
-                min-width: 0;
-            }
-
-            .capture-panel {
-                position: static;
-            }
+            body { padding: 14px; padding-bottom: 78px; }
+            .topbar { grid-template-columns: 1fr; display: grid; }
+            .add-workspace { grid-template-columns: 1fr; }
+            .quick-stats { min-width: 0; }
+            .capture-panel { position: static; }
+            .mobile-nav { display: flex; }
         }
 
         @media (max-width: 680px) {
-            .form-grid, .job-main, .toolbar {
-                grid-template-columns: 1fr;
-            }
-
-            .toolbar {
-                display: grid;
-            }
-
-            .capture-actions, .form-actions, .input-row, .quick-stats {
-                grid-template-columns: 1fr;
-            }
-
-            .price {
-                text-align: left;
-            }
+            .form-grid, .toolbar { grid-template-columns: 1fr; }
+            .toolbar { display: grid; }
+            .capture-actions, .form-actions, .input-row, .quick-stats { grid-template-columns: 1fr; }
+            .job-card { grid-template-columns: 64px 1fr; }
+            .job-info-grid { grid-template-columns: 1fr; }
+            .time-clock { font-size: 1.05rem; }
         }
     </style>
 </head>
@@ -512,7 +607,7 @@
             <div>
                 <p class="eyebrow">Fastwork freelance workflow</p>
                 <h1>จัดงานลูกค้าจากแคปแชทให้ไวขึ้น</h1>
-                <p class="subtitle">วางรูปหรืออัปโหลดภาพแชท ระบบจะ OCR แล้วเดาชื่อ เบอร์ ที่อยู่ รายละเอียดงาน ลิงก์แผนที่ และราคาให้ก่อน ช่องไหนไม่เจอให้เติมเองได้ทันที</p>
+                <p class="subtitle">ดูตารางงานทั้งหมดได้ทันทีที่เปิดแอป กดแท็บ "เพิ่มงาน" เมื่อมีงานใหม่ วางรูปแคปแชทให้ระบบอ่านและเดาข้อมูลให้ก่อน ช่องไหนไม่เจอให้เติมเองได้</p>
             </div>
             <section class="quick-stats" aria-label="สรุปงาน">
                 <div class="stat"><span>งานค้าง</span><strong id="pending-count">0</strong></div>
@@ -521,100 +616,131 @@
             </section>
         </header>
 
-        <section class="workspace">
-            <aside class="panel capture-panel">
-                <div class="panel-header">
-                    <div>
-                        <h2>1. นำเข้าจากแชท</h2>
-                        <p class="panel-note">ลากรูปเข้ามา คลิกเลือกไฟล์ หรือกด Ctrl+V เพื่อวางภาพจาก clipboard</p>
-                    </div>
-                </div>
-                <div class="drop-zone" id="drop-zone">
-                    <input id="chat-image" type="file" accept="image/*" aria-label="อัปโหลดภาพแชท">
-                    <img id="image-preview" class="image-preview" alt="ตัวอย่างภาพแชท">
-                    <div id="drop-content" class="drop-content">
-                        <strong>วางภาพแคปแชทตรงนี้</strong>
-                        <span>รองรับ PNG, JPG และภาพที่คัดลอกมา</span>
-                    </div>
-                </div>
-                <div class="capture-actions">
-                    <button type="button" id="ocr-btn">อ่านข้อมูลจากรูป</button>
-                    <button type="button" class="secondary-btn" id="parse-btn">ดึงข้อมูลจากข้อความ</button>
-                </div>
-                <div class="ocr-text">
-                    <p class="ocr-status" id="ocr-status">ยังไม่ได้เลือกรูป</p>
-                    <textarea id="chat-text" placeholder="หรือวางข้อความแชทที่นี่ แล้วกดดึงข้อมูลจากข้อความ"></textarea>
-                </div>
-            </aside>
+        <!-- PAGE SWITCHER (desktop/tablet) -->
+        <nav class="page-nav" aria-label="สลับหน้า">
+            <button type="button" class="nav-jobs active" data-page="jobs">
+                📋 ตารางงาน <span class="nav-count" id="nav-jobs-count">0</span>
+            </button>
+            <button type="button" class="nav-add" data-page="add">
+                ➕ เพิ่มงาน
+            </button>
+        </nav>
 
-            <div>
-                <form class="panel form-panel" id="job-form">
+        <!-- ===================== PAGE 1: ตารางงาน (default) ===================== -->
+        <section class="page active" id="page-jobs">
+            <section class="panel jobs-panel">
+                <div class="toolbar">
+                    <div>
+                        <h2>ตารางงาน</h2>
+                        <p class="panel-note">เรียงงานค้างก่อน แล้วตามวันเวลาที่ใกล้ที่สุด</p>
+                    </div>
+                    <input id="search-input" class="search-box" type="search" placeholder="ค้นหาชื่อ เบอร์ ที่อยู่ รายละเอียด">
+                </div>
+                <div class="filter-chips" role="group" aria-label="กรองสถานะงาน">
+                    <button type="button" class="chip active" data-filter="all">ทั้งหมด</button>
+                    <button type="button" class="chip" data-filter="pending">รอดำเนินการ</button>
+                    <button type="button" class="chip" data-filter="completed">เสร็จแล้ว</button>
+                </div>
+                <div id="job-list" class="job-list"></div>
+            </section>
+        </section>
+
+        <!-- ===================== PAGE 2: เพิ่มงาน ===================== -->
+        <section class="page" id="page-add">
+            <section class="add-workspace">
+                <aside class="panel capture-panel">
                     <div class="panel-header">
                         <div>
-                            <h2>2. ตรวจข้อมูลและบันทึกงาน</h2>
-                            <p class="panel-note">ระบบเติมเท่าที่เดาได้ ส่วนที่ไม่แน่ใจปล่อยว่างไว้ให้แก้เอง</p>
+                            <h2>1. นำเข้าจากแชท</h2>
+                            <p class="panel-note">ลากรูปเข้ามา คลิกเลือกไฟล์ หรือกด Ctrl+V เพื่อวางภาพจาก clipboard</p>
                         </div>
                     </div>
-                    <div class="form-grid">
-                        <div class="field">
-                            <label for="customer-name">ชื่อ / User ลูกค้า</label>
-                            <input id="customer-name" type="text" autocomplete="name" required>
-                        </div>
-                        <div class="field">
-                            <label for="customer-phone">เบอร์โทร</label>
-                            <input id="customer-phone" type="tel" autocomplete="tel" required>
-                        </div>
-                        <div class="field wide">
-                            <label for="customer-address-text">ที่อยู่</label>
-                            <textarea id="customer-address-text"></textarea>
-                        </div>
-                        <div class="field">
-                            <label for="customer-address-link">ลิงก์แผนที่</label>
-                            <input id="customer-address-link" type="url" placeholder="https://maps.app.goo.gl/...">
-                        </div>
-                        <div class="field">
-                            <label for="job-price">ราคา</label>
-                            <input id="job-price" type="number" inputmode="decimal" min="0" step="1" placeholder="เช่น 1200">
-                        </div>
-                        <div class="field wide">
-                            <label for="job-description">อาการ / รายละเอียดงาน</label>
-                            <textarea id="job-description" required></textarea>
-                        </div>
-                        <div class="field">
-                            <label>ระยะเวลาที่ใช้</label>
-                            <div class="input-row">
-                                <input id="job-duration-hours" type="number" min="0" placeholder="ชั่วโมง">
-                                <input id="job-duration-minutes" type="number" min="0" max="59" placeholder="นาที">
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label>กำหนดงาน</label>
-                            <div class="input-row">
-                                <input id="job-date" type="date" required>
-                                <input id="job-time" type="time" required>
-                            </div>
+                    <div class="drop-zone" id="drop-zone">
+                        <input id="chat-image" type="file" accept="image/*" aria-label="อัปโหลดภาพแชท">
+                        <img id="image-preview" class="image-preview" alt="ตัวอย่างภาพแชท">
+                        <div id="drop-content" class="drop-content">
+                            <strong>วางภาพแคปแชทตรงนี้</strong>
+                            <span>รองรับ PNG, JPG และภาพที่คัดลอกมา · ภาพที่ตัวอักษรชัดและไม่เอียงจะอ่านได้แม่นกว่ามาก</span>
                         </div>
                     </div>
-                    <p class="hint-strip">ทิป: หลัง OCR เสร็จ ลองเช็คเบอร์และบ้านเลขที่อีกครั้ง เพราะข้อความจากภาพแชทอาจอ่านเลขผิดได้</p>
-                    <div class="form-actions">
-                        <button id="submit-btn" type="submit">บันทึกงาน</button>
-                        <button id="cancel-btn" class="secondary-btn" type="button" hidden>ยกเลิกแก้ไข</button>
+                    <div class="capture-actions">
+                        <button type="button" id="ocr-btn">อ่านข้อมูลจากรูป</button>
+                        <button type="button" class="secondary-btn" id="parse-btn">ดึงข้อมูลจากข้อความ</button>
                     </div>
-                </form>
+                    <div class="ocr-text">
+                        <p class="ocr-status" id="ocr-status">ยังไม่ได้เลือกรูป</p>
+                        <textarea id="chat-text" placeholder="หรือวางข้อความแชทที่นี่ แล้วกดดึงข้อมูลจากข้อความ"></textarea>
+                    </div>
+                </aside>
 
-                <section class="panel jobs-panel">
-                    <div class="toolbar">
-                        <div>
-                            <h2>3. รายการงาน</h2>
-                            <p class="panel-note">เรียงงานค้างก่อน แล้วตามวันเวลา</p>
+                <div>
+                    <form class="panel form-panel" id="job-form">
+                        <div class="panel-header">
+                            <div>
+                                <h2>2. ตรวจข้อมูลและบันทึกงาน</h2>
+                                <p class="panel-note">ระบบเติมเท่าที่เดาได้ ส่วนที่ไม่แน่ใจปล่อยว่างไว้ให้แก้เอง</p>
+                            </div>
                         </div>
-                        <input id="search-input" class="search-box" type="search" placeholder="ค้นหาชื่อ เบอร์ ที่อยู่ รายละเอียด">
-                    </div>
-                    <div id="job-list" class="job-list"></div>
-                </section>
-            </div>
+                        <div class="form-grid">
+                            <div class="field">
+                                <label for="customer-name">ชื่อ / User ลูกค้า</label>
+                                <input id="customer-name" type="text" autocomplete="name" required>
+                            </div>
+                            <div class="field">
+                                <label for="customer-phone">เบอร์โทร</label>
+                                <input id="customer-phone" type="tel" autocomplete="tel" required>
+                            </div>
+                            <div class="field wide">
+                                <label for="customer-address-text">ที่อยู่</label>
+                                <textarea id="customer-address-text"></textarea>
+                            </div>
+                            <div class="field">
+                                <label for="customer-address-link">ลิงก์แผนที่</label>
+                                <input id="customer-address-link" type="url" placeholder="https://maps.app.goo.gl/...">
+                            </div>
+                            <div class="field">
+                                <label for="job-price">ราคา</label>
+                                <input id="job-price" type="number" inputmode="decimal" min="0" step="1" placeholder="เช่น 1200">
+                            </div>
+                            <div class="field wide">
+                                <label for="job-description">อาการ / รายละเอียดงาน</label>
+                                <textarea id="job-description" required></textarea>
+                            </div>
+                            <div class="field">
+                                <label>ระยะเวลาที่ใช้</label>
+                                <div class="input-row">
+                                    <input id="job-duration-hours" type="number" min="0" placeholder="ชั่วโมง">
+                                    <input id="job-duration-minutes" type="number" min="0" max="59" placeholder="นาที">
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label>กำหนดงาน</label>
+                                <div class="input-row">
+                                    <input id="job-date" type="date" required>
+                                    <input id="job-time" type="time" required>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="hint-strip">ทิป: หลัง OCR เสร็จ ลองเช็คเบอร์และบ้านเลขที่อีกครั้ง เพราะข้อความจากภาพแชทอาจอ่านเลขผิดได้</p>
+                        <div class="form-actions">
+                            <button id="submit-btn" type="submit">บันทึกงาน</button>
+                            <button id="cancel-btn" class="secondary-btn" type="button" hidden>ยกเลิกแก้ไข</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </section>
     </main>
+
+    <!-- Mobile bottom nav -->
+    <nav class="mobile-nav" aria-label="สลับหน้า (มือถือ)">
+        <button type="button" class="m-nav-jobs active" data-page="jobs">
+            <span class="ico">📋</span>ตารางงาน
+        </button>
+        <button type="button" class="m-nav-add" data-page="add">
+            <span class="ico">➕</span>เพิ่มงาน
+        </button>
+    </nav>
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -628,6 +754,7 @@
         let isEditing = false;
         let editingJobId = null;
         let currentImageFile = null;
+        let statusFilter = "all";
 
         const form = document.getElementById("job-form");
         const jobList = document.getElementById("job-list");
@@ -642,6 +769,7 @@
         const searchInput = document.getElementById("search-input");
         const cancelBtn = document.getElementById("cancel-btn");
         const submitBtn = document.getElementById("submit-btn");
+        const filterChips = document.querySelectorAll(".chip");
 
         const fields = {
             name: document.getElementById("customer-name"),
@@ -656,6 +784,26 @@
             time: document.getElementById("job-time")
         };
 
+        /* ============== PAGE SWITCHING ============== */
+        function goToPage(pageName) {
+            document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+            document.getElementById(`page-${pageName}`).classList.add("active");
+
+            document.querySelectorAll(".page-nav button, .mobile-nav button").forEach(btn => {
+                btn.classList.toggle("active", btn.dataset.page === pageName);
+            });
+
+            if (pageName === "add" && !isEditing) {
+                setDefaultSchedule();
+            }
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        document.querySelectorAll(".page-nav button, .mobile-nav button").forEach(btn => {
+            btn.addEventListener("click", () => goToPage(btn.dataset.page));
+        });
+
+        /* ============== STORAGE ============== */
         function saveJobs() {
             localStorage.setItem(storageKey, JSON.stringify(jobs));
         }
@@ -754,13 +902,15 @@
                 [fields.description, parsed.description]
             ];
 
+            let filledAny = false;
             map.forEach(([field, value]) => {
-                if (value && !field.value.trim()) field.value = value;
+                if (value && !field.value.trim()) { field.value = value; filledAny = true; }
             });
             setDefaultSchedule();
-            showToast("ดึงข้อมูลให้แล้ว ลองตรวจช่องที่ยังว่างอีกครั้ง");
+            showToast(filledAny ? "ดึงข้อมูลให้แล้ว ลองตรวจช่องที่ยังว่างอีกครั้ง" : "ไม่พบข้อมูลที่จับคู่ได้ ลองกรอกเองหรือแก้ไขข้อความ");
         }
 
+        /* ============== STATS ============== */
         function renderStats() {
             const today = new Date().toISOString().slice(0, 10);
             const pending = jobs.filter(job => job.status === "pending");
@@ -769,12 +919,15 @@
             document.getElementById("pending-count").textContent = pending.length;
             document.getElementById("today-count").textContent = todayJobs.length;
             document.getElementById("total-revenue").textContent = formatMoney(revenue);
+            document.getElementById("nav-jobs-count").textContent = jobs.length;
         }
 
+        /* ============== JOB LIST RENDERING ============== */
         function renderJobs() {
             renderStats();
             const query = searchInput.value.trim().toLowerCase();
             const filtered = jobs.filter(job => {
+                if (statusFilter !== "all" && job.status !== statusFilter) return false;
                 const haystack = [
                     job.customer.name,
                     job.customer.phone,
@@ -789,22 +942,47 @@
             });
 
             if (!filtered.length) {
-                jobList.innerHTML = `<div class="empty">${query ? "ไม่พบงานที่ค้นหา" : "ยังไม่มีงานในระบบ เริ่มจากแคปแชทหรือกรอกงานแรกได้เลย"}</div>`;
+                const emptyMsg = query || statusFilter !== "all"
+                    ? "ไม่พบงานที่ตรงกับตัวกรองนี้"
+                    : "ยังไม่มีงานในระบบ";
+                const emptySub = query || statusFilter !== "all"
+                    ? "ลองเปลี่ยนคำค้นหรือตัวกรองสถานะ"
+                    : "กดแท็บ \"เพิ่มงาน\" ด้านบนเพื่อเริ่มงานแรก";
+                jobList.innerHTML = `<div class="empty"><strong>${emptyMsg}</strong>${emptySub}</div>`;
                 return;
             }
 
             let lastDate = "";
             jobList.innerHTML = filtered.map(job => {
                 const dateKey = (job.schedule || "").slice(0, 10) || "ไม่ระบุวันที่";
-                const dateTitle = dateKey !== lastDate ? `<div class="date-title">${formatDateTitle(job.schedule)}</div>` : "";
+                const dateTitle = dateKey !== lastDate ? renderDateTitle(job.schedule) : "";
                 lastDate = dateKey;
                 return dateTitle + renderJobCard(job);
             }).join("");
         }
 
-        function formatDateTitle(schedule) {
-            if (!schedule) return "ไม่ระบุวันที่";
-            return new Date(schedule).toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+        function renderDateTitle(schedule) {
+            if (!schedule) {
+                return `<div class="date-title">ไม่ระบุวันที่</div>`;
+            }
+            const date = new Date(schedule);
+            const today = new Date();
+            const isToday = date.toDateString() === today.toDateString();
+            const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+            const isTomorrow = date.toDateString() === tomorrow.toDateString();
+            const full = date.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+            const tag = isToday ? `<span class="day-tag">วันนี้</span>` : isTomorrow ? `<span class="day-tag">พรุ่งนี้</span>` : "";
+            return `<div class="date-title">${full}${tag}</div>`;
+        }
+
+        function formatWeekdayShort(schedule) {
+            if (!schedule) return "-";
+            return new Date(schedule).toLocaleDateString("th-TH", { weekday: "short" });
+        }
+
+        function formatDayMonth(schedule) {
+            if (!schedule) return "-";
+            return new Date(schedule).toLocaleDateString("th-TH", { day: "numeric", month: "short" });
         }
 
         function formatTime(schedule) {
@@ -813,37 +991,47 @@
         }
 
         function renderJobCard(job) {
-            const map = job.address.link ? `<a href="${escapeAttr(job.address.link)}" target="_blank" rel="noopener">เปิดแผนที่</a>` : "ไม่มีลิงก์แผนที่";
-            const address = job.address.text || "ยังไม่ได้ใส่ที่อยู่";
+            const map = job.address.link ? `<a href="${escapeAttr(job.address.link)}" target="_blank" rel="noopener">📍 เปิดแผนที่</a>` : "";
+            const address = job.address.text || "";
             const statusClass = job.status === "completed" ? "completed" : "pending";
-            const statusText = job.status === "completed" ? "เสร็จแล้ว" : "รอดำเนินการ";
-            const phone = job.customer.phone || "-";
+            const statusText = job.status === "completed" ? "✓ เสร็จแล้ว" : "⏳ รอดำเนินการ";
+            const phone = job.customer.phone || "";
+            const duration = job.duration && job.duration !== "0 ชั่วโมง 0 นาที" ? job.duration : "";
             const actions = job.status === "pending"
                 ? `<button type="button" onclick="completeJob(${job.id})">เสร็จงาน</button>`
                 : `<button type="button" class="secondary-btn" onclick="reopenJob(${job.id})">เปิดงานใหม่</button>`;
 
             return `
-                <article class="job-card">
-                    <div class="job-main">
-                        <div>
+                <article class="job-card ${statusClass}">
+                    <div class="job-time-block">
+                        <div class="time-clock">${formatTime(job.schedule)}</div>
+                        <div class="time-wday">${formatWeekdayShort(job.schedule)}</div>
+                        <div class="time-dom">${formatDayMonth(job.schedule)}</div>
+                    </div>
+                    <div class="job-body">
+                        <div class="job-top-row">
                             <p class="job-name">${escapeHtml(job.customer.name || "ไม่ระบุชื่อลูกค้า")}</p>
-                            <div class="job-meta">
-                                <a href="tel:${escapeAttr(phone)}">${escapeHtml(phone)}</a>
-                                <button type="button" class="secondary-btn" onclick="copyToClipboard('${escapeAttr(phone)}')">คัดลอก</button><br>
-                                ${escapeHtml(address)}<br>${map}
+                            <span class="badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="job-info-grid">
+                            <div class="info-item">
+                                <span class="ico">📞</span>
+                                ${phone
+                                    ? `<span class="val"><a href="tel:${escapeAttr(phone)}">${escapeHtml(phone)}</a><button type="button" class="copy-phone-btn" onclick="copyToClipboard('${escapeAttr(phone)}')">คัดลอก</button></span>`
+                                    : `<span class="val" style="color:var(--muted)">ไม่มีเบอร์โทร</span>`}
+                            </div>
+                            ${duration ? `<div class="info-item"><span class="ico">⏱</span><span class="val">${escapeHtml(duration)}</span></div>` : ""}
+                            ${address ? `<div class="info-item wide"><span class="ico">🏠</span><span class="val">${escapeHtml(address)} ${map}</span></div>` : ""}
+                        </div>
+                        ${job.description ? `<div class="job-desc">${escapeHtml(job.description)}</div>` : ""}
+                        <div class="job-bottom-row">
+                            <span class="price-tag">${job.price ? formatMoney(job.price) : ""}</span>
+                            <div class="job-actions">
+                                ${actions}
+                                <button type="button" class="secondary-btn" onclick="editJob(${job.id})">แก้ไข</button>
+                                <button type="button" class="danger-btn" onclick="deleteJob(${job.id})">ลบ</button>
                             </div>
                         </div>
-                        <div class="job-meta">
-                            <span class="badge ${statusClass}">${statusText}</span><br>
-                            <strong>${formatTime(job.schedule)}</strong> · ${escapeHtml(job.duration || "0 ชั่วโมง 0 นาที")}<br>
-                            ${escapeHtml(job.description || "ไม่มีรายละเอียด")}
-                        </div>
-                        <div class="price">${formatMoney(job.price)}</div>
-                    </div>
-                    <div class="job-actions">
-                        ${actions}
-                        <button type="button" class="secondary-btn" onclick="editJob(${job.id})">แก้ไข</button>
-                        <button type="button" class="danger-btn" onclick="deleteJob(${job.id})">ลบ</button>
                     </div>
                 </article>
             `;
@@ -863,6 +1051,7 @@
             return escapeHtml(value).replace(/`/g, "&#096;");
         }
 
+        /* ============== FORM HANDLING ============== */
         function getFormData() {
             const hours = fields.hours.value || 0;
             const minutes = fields.minutes.value || 0;
@@ -897,6 +1086,7 @@
             saveJobs();
             resetFormState();
             renderJobs();
+            goToPage("jobs");
         }
 
         function editJob(jobId) {
@@ -918,7 +1108,7 @@
             editingJobId = jobId;
             submitBtn.textContent = "บันทึกการแก้ไข";
             cancelBtn.hidden = false;
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            goToPage("add");
         }
 
         function resetFormState() {
@@ -936,6 +1126,7 @@
                 job.status = "completed";
                 saveJobs();
                 renderJobs();
+                showToast("ทำเครื่องหมายว่าเสร็จแล้ว");
             }
         }
 
@@ -945,6 +1136,7 @@
                 job.status = "pending";
                 saveJobs();
                 renderJobs();
+                showToast("เปิดงานนี้ใหม่แล้ว");
             }
         }
 
@@ -953,19 +1145,56 @@
             jobs = jobs.filter(item => item.id !== jobId);
             saveJobs();
             renderJobs();
+            showToast("ลบงานแล้ว");
         }
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => showToast(`คัดลอก ${text} แล้ว`));
         }
 
+        /* ============== IMAGE / OCR ============== */
         function handleImage(file) {
             if (!file || !file.type.startsWith("image/")) return;
             currentImageFile = file;
             imagePreview.src = URL.createObjectURL(file);
             imagePreview.style.display = "block";
             dropContent.style.display = "none";
+            ocrStatus.className = "ocr-status";
             ocrStatus.textContent = "เลือกรูปแล้ว กดอ่านข้อมูลจากรูปได้เลย";
+        }
+
+        /**
+         * Preprocess the image before OCR to boost accuracy on chat screenshots:
+         * upscale small images and increase contrast so Thai glyphs (which have
+         * fine details like loops and tone marks) stay legible to Tesseract.
+         */
+        async function preprocessForOcr(file) {
+            const img = await new Promise((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+                image.src = URL.createObjectURL(file);
+            });
+
+            const scale = img.width < 1000 ? 2 : 1;
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            const ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const gray = data[i] * 0.3 + data[i + 1] * 0.59 + data[i + 2] * 0.11;
+                const contrasted = Math.min(255, Math.max(0, (gray - 128) * 1.35 + 128));
+                data[i] = data[i + 1] = data[i + 2] = contrasted;
+            }
+            ctx.putImageData(imageData, 0, 0);
+
+            return new Promise(resolve => canvas.toBlob(resolve, "image/png"));
         }
 
         async function runOcr() {
@@ -974,24 +1203,42 @@
                 return;
             }
             if (!window.Tesseract) {
+                ocrStatus.className = "ocr-status err";
                 ocrStatus.textContent = "โหลด OCR ไม่สำเร็จ ลองวางข้อความแชทแทนได้";
                 return;
             }
             ocrBtn.disabled = true;
-            ocrStatus.textContent = "กำลังอ่านตัวอักษรจากภาพ...";
+            ocrStatus.className = "ocr-status busy";
+            ocrStatus.textContent = "กำลังเตรียมภาพ...";
             try {
-                const result = await Tesseract.recognize(currentImageFile, "tha+eng", {
+                const processedBlob = await preprocessForOcr(currentImageFile);
+                ocrStatus.textContent = "กำลังอ่านตัวอักษรจากภาพ...";
+
+                const result = await Tesseract.recognize(processedBlob, "tha+eng", {
                     logger: progress => {
                         if (progress.status === "recognizing text") {
                             ocrStatus.textContent = `กำลังอ่านภาพ ${Math.round(progress.progress * 100)}%`;
                         }
-                    }
+                    },
+                    // PSM 6 = "uniform block of text", suits chat-bubble screenshots
+                    // better than default page-layout detection.
+                    tessedit_pageseg_mode: 6
                 });
-                chatText.value = result.data.text.trim();
-                ocrStatus.textContent = "อ่านภาพเสร็จแล้ว";
-                applyParsedInfo(parseChatInfo(chatText.value));
+
+                const cleanedText = result.data.text.replace(/[ \t]+\n/g, "\n").trim();
+                chatText.value = cleanedText;
+
+                if (!cleanedText) {
+                    ocrStatus.className = "ocr-status err";
+                    ocrStatus.textContent = "อ่านภาพไม่ออกเลย ลองครอปให้เห็นแค่ข้อความ ตัวอักษรชัด ไม่เอียง";
+                } else {
+                    ocrStatus.className = "ocr-status ok";
+                    ocrStatus.textContent = "อ่านภาพเสร็จแล้ว กำลังดึงข้อมูลให้...";
+                    applyParsedInfo(parseChatInfo(chatText.value));
+                }
             } catch (error) {
                 console.error(error);
+                ocrStatus.className = "ocr-status err";
                 ocrStatus.textContent = "OCR ไม่สำเร็จ ลองครอปภาพให้เห็นข้อความชัดขึ้นหรือวางข้อความเอง";
             } finally {
                 ocrBtn.disabled = false;
@@ -1016,8 +1263,17 @@
         ocrBtn.addEventListener("click", runOcr);
         parseBtn.addEventListener("click", () => applyParsedInfo(parseChatInfo(chatText.value)));
         form.addEventListener("submit", addOrUpdateJob);
-        cancelBtn.addEventListener("click", resetFormState);
+        cancelBtn.addEventListener("click", () => { resetFormState(); goToPage("jobs"); });
         searchInput.addEventListener("input", renderJobs);
+
+        filterChips.forEach(chip => {
+            chip.addEventListener("click", () => {
+                filterChips.forEach(c => c.classList.remove("active"));
+                chip.classList.add("active");
+                statusFilter = chip.dataset.filter;
+                renderJobs();
+            });
+        });
 
         document.addEventListener("DOMContentLoaded", () => {
             loadJobs();
